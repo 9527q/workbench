@@ -72,6 +72,7 @@ def split_excel_column(
     new_path = excel_path.new_path
     new_df.to_excel(new_path.path, index=False)
     print(f"拆分完成，新文件路径：{new_path}")
+    print("爱你呦 😘 😘")
 
 
 if __name__ == "__main__":
