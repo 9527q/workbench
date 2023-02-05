@@ -36,7 +36,7 @@ class ExcelPath(FilePath):
     """excel path, only xlsx"""
 
     def check_is_valid(self) -> bool:
-        return self.path.endswith("xlsx") and super().check_is_valid()
+        return super().check_is_valid() and self.path.endswith("xlsx")
 
 
 def split_excel_column(
@@ -76,7 +76,7 @@ def split_excel_column(
 
 if __name__ == "__main__":
     while 1:
-        excel_name = input("请拖动要拆分某列数据的 Excel 文件过来：")
+        excel_name = input("请拖动要拆分某列数据的 Excel 文件过来：").strip()
         excel_path = ExcelPath(path=excel_name)
         if not excel_path.check_is_valid():
             print("不是 Excel 文件")
@@ -85,7 +85,7 @@ if __name__ == "__main__":
         else:
             break
     while 1:
-        column_name = input("请输入要拆分的名：")
+        column_name = input("请输入要拆分的名：").strip()
         if column_name:
             break
     split_tags = list(input(f"请指定分隔符（不输入则默认为{DEFAULT_TAGS}）：")) or DEFAULT_TAGS

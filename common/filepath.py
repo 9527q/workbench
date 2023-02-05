@@ -12,7 +12,7 @@ class FilePath(BaseModel):
 
     def check_is_valid(self) -> bool:
         """must file，not dir"""
-        return "." in self.path and not self.path.endswith(".")
+        return self.path and "." in self.path and not self.path.endswith(".")
 
     @property
     def new_path(self) -> "FilePath":
