@@ -19,11 +19,13 @@
         | AAA  | BBB  | c3   |
         | AAA  | BBB  | c3   |
 """
-
+import os
 import re
 
 import pandas as pd
 from common.filepath import FilePath
+
+__all__ = ["ExcelPath", "split_excel_column"]
 
 
 # 默认分隔符，逗号，空格
@@ -38,13 +40,10 @@ class ExcelPath(FilePath):
 
 
 def split_excel_column(
-    excel_path: str, column_name: str, split_tags: list[str] = DEFAULT_TAGS
+    excel_path: ExcelPath, column_name: str, split_tags: list[str] = None
 ):
-    path = ExcelPath(path=excel_path)
-    if not path:
-        print(f"不是 Excel 文件路径：'{path}'")
-        return
-
+    if split_tags is None:
+        split_tags = DEFAULT_TAGS
     split_tag_set = frozenset(split_tags)
     if not split_tag_set:
         print("分隔符至少指定一个")
@@ -52,7 +51,7 @@ def split_excel_column(
 
     split_re = re.compile("|".join(split_tag_set))
 
-    old_df = pd.read_excel(excel_path, dtype=str, keep_default_na=False)
+    old_df = pd.read_excel(excel_path.path, dtype=str, keep_default_na=False)
     new_df = pd.DataFrame().reindex_like(old_df)
 
     new_row_i = 0
@@ -70,14 +69,28 @@ def split_excel_column(
             new_df.loc[new_row_i] = new_row
             new_row_i += 1
 
-    new_path = path.new_path
-    new_df.to_excel(str(new_path), index=False)
+    new_path = excel_path.new_path
+    new_df.to_excel(new_path.path, index=False)
     print(f"拆分完成，新文件路径：{new_path}")
 
 
 if __name__ == "__main__":
-    import sys
-    print(sys.argv)
-    # excel_path = "/Users/ike/Desktop/赠品规则_2023-01-11_12-25-54.xlsx"
-    # column_name = "包含其中任何一个商品"
-    # split_excel_column(excel_path=excel_path, column_name=column_name)
+    while 1:
+        excel_name = input("请拖动要拆分某列数据的 Excel 文件过来：")
+        excel_path = ExcelPath(path=excel_name)
+        if not excel_path.check_is_valid():
+            print("不是 Excel 文件")
+        elif not os.path.exists(excel_path.path):
+            print("文件不存在")
+        else:
+            break
+    while 1:
+        column_name = input("请输入要拆分的名：")
+        if column_name:
+            break
+    split_tags = list(input(f"请指定分隔符（不输入则默认为{DEFAULT_TAGS}）：")) or DEFAULT_TAGS
+    print(f"分隔符为 {split_tags}")
+
+    split_excel_column(
+        excel_path=excel_path, column_name=column_name, split_tags=split_tags
+    )
