@@ -21,6 +21,7 @@
 """
 import os
 import re
+import warnings
 
 import pandas as pd
 from common.filepath import FilePath
@@ -39,7 +40,7 @@ class ExcelPath(FilePath):
         return super().check_is_valid() and self.path.endswith("xlsx")
 
 
-def split_excel_column(
+def split_excel_column_(
     excel_path: ExcelPath, column_name: str, split_tags: list[str] = None
 ):
     if split_tags is None:
@@ -72,12 +73,17 @@ def split_excel_column(
     new_path = excel_path.new_path
     new_df.to_excel(new_path.path, index=False)
     print(f"拆分完成，新文件路径：{new_path}")
-    print("爱你呦 😘 😘")
+
+
+def split_excel_column(*args, **kwargs):
+    with warnings.catch_warnings(record=True):
+        warnings.simplefilter("always")
+        split_excel_column_(*args, **kwargs)
 
 
 if __name__ == "__main__":
     while 1:
-        excel_name = input("请拖动要拆分某列数据的 Excel 文件过来：").strip()
+        excel_name = input("Excel 文件绝对路径（可直接拖动文件过来）：").strip(" '")
         excel_path = ExcelPath(path=excel_name)
         if not excel_path.check_is_valid():
             print("不是 Excel 文件")
@@ -86,7 +92,7 @@ if __name__ == "__main__":
         else:
             break
     while 1:
-        column_name = input("请输入要拆分的名：").strip()
+        column_name = input("请输入要拆分的列名：").strip()
         if column_name:
             break
     split_tags = list(input(f"请指定分隔符（不输入则默认为{DEFAULT_TAGS}）：")) or DEFAULT_TAGS
@@ -95,3 +101,4 @@ if __name__ == "__main__":
     split_excel_column(
         excel_path=excel_path, column_name=column_name, split_tags=split_tags
     )
+    print("爱你呦 😘 😘")
