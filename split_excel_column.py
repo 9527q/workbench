@@ -24,24 +24,18 @@ import re
 import warnings
 
 import pandas as pd
-from common.filepath import FilePath
 
-__all__ = ["ExcelPath", "split_excel_column"]
+from common.filepath import check_excel_filepath_valid, gen_brother_filepath
+
+__all__ = ["split_excel_column"]
 
 
 # 默认分隔符，逗号，空格
 DEFAULT_TAGS = [",", " "]
 
 
-class ExcelPath(FilePath):
-    """excel path, only xlsx"""
-
-    def check_is_valid(self) -> bool:
-        return super().check_is_valid() and self.path.endswith("xlsx")
-
-
 def split_excel_column_(
-    excel_path: ExcelPath, column_name: str, split_tags: list[str] = None
+    excel_path: str, column_name: str, split_tags: list[str] = None
 ):
     if split_tags is None:
         split_tags = DEFAULT_TAGS
@@ -52,7 +46,7 @@ def split_excel_column_(
 
     split_re = re.compile("|".join(split_tag_set))
 
-    old_df = pd.read_excel(excel_path.path, dtype=str, keep_default_na=False)
+    old_df = pd.read_excel(excel_path, dtype=str, keep_default_na=False)
     new_df = pd.DataFrame().reindex_like(old_df)
 
     new_row_i = 0
@@ -70,7 +64,7 @@ def split_excel_column_(
             new_df.loc[new_row_i] = new_row
             new_row_i += 1
 
-    new_path = excel_path.new_path
+    new_path = gen_brother_filepath(excel_path)
     new_df.to_excel(new_path.path, index=False)
     print(f"拆分完成，新文件路径：{new_path}")
 
@@ -83,11 +77,10 @@ def split_excel_column(*args, **kwargs):
 
 if __name__ == "__main__":
     while 1:
-        excel_name = input("Excel 文件绝对路径（可直接拖动文件过来）：").strip(" '")
-        excel_path = ExcelPath(path=excel_name)
-        if not excel_path.check_is_valid():
+        excel_path = input("Excel 文件绝对路径（可直接拖动文件过来）：").strip(" '")
+        if not check_excel_filepath_valid(excel_path):
             print("不是 Excel 文件")
-        elif not os.path.exists(excel_path.path):
+        elif not os.path.exists(excel_path):
             print("文件不存在")
         else:
             break
