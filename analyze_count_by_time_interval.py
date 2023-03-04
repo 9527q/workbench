@@ -8,8 +8,8 @@
 """
 import pandas as pd
 
-from common.plot import plot_to_file
-from common.filepath import gen_brother_filepath
+from common.filepath import gen_brother_path
+from common.plot import bar_to_file, plot_to_file
 
 __all__ = ["analyze_count_by_time_interval", "gen_time_interval"]
 
@@ -25,7 +25,7 @@ def analyze_count_by_time_interval(
     csv_path: str, timestamp_column_name: str, time_interval: str
 ):
     # 读取 Excel 文件
-    df = pd.read_csv(csv_path)
+    df = pd.read_csv(csv_path, on_bad_lines='skip')
 
     # 转换 TS 列为时间戳格式
     df[timestamp_column_name] = pd.to_datetime(df[timestamp_column_name])
@@ -41,18 +41,28 @@ def analyze_count_by_time_interval(
     result["TS"] = result["TS"].dt.strftime("%H:%M")
 
     # 输出结果
-    print(result)
+    # print(result)
 
-    plot_to_file(
-        result[timestamp_column_name],
-        result["counts"],
-        image_path=gen_brother_filepath(csv_path, new_suffix="jpg"),
+    # 画图
+    plot_kwargs = dict(
+        x=result[timestamp_column_name],
+        y=result["counts"],
+        x_label="Time",
+        y_label="Data Count",
+        figsize=(16, 8),
+    )
+    plot_to_file(**plot_kwargs, image_path=gen_brother_path(csv_path, new_type="jpg"))
+    bar_to_file(**plot_kwargs, image_path=gen_brother_path(csv_path, new_type="jpg"))
+    bar_to_file(
+        **plot_kwargs,
+        image_path=gen_brother_path(csv_path, new_type="jpg"),
+        auto_ylim=False,
     )
 
 
 if __name__ == "__main__":
-    csv_path = "/Users/ike/Desktop/custins7195427_1675907949295.csv"
-    time_interval_minute = 30  # 30 分钟为一组
+    csv_path = "/Users/ike/Downloads/ticket_ticket.csv"
+    time_interval_minute = 30  # 时间分组
     analyze_count_by_time_interval(
         csv_path=csv_path,
         timestamp_column_name=RDS_TIMESTAMP_COLUMN_NAME,

@@ -1,28 +1,26 @@
 import os
 
-__all__ = ["check_filepath_valid", "check_excel_filepath_valid","gen_brother_filepath"]
-def check_filepath_valid(filepath: str) -> bool:
-    """is file，not dir"""
-    return filepath and "." in filepath and not filepath.endswith(".")
+__all__ = ["check_excel_path_valid", "gen_brother_path"]
 
 
-def check_excel_filepath_valid(excel_filepath: str) -> bool:
+def check_excel_path_valid(excel_path: str) -> bool:
     """is Excel file, only xlsx"""
-    return check_filepath_valid(excel_filepath) and excel_filepath.endswith(".xlsx")
+    return os.path.isfile(excel_path) and excel_path.endswith(".xlsx")
 
-def gen_brother_filepath(old_filepath: str, new_suffix: str = None) -> str:
-    """
-    new file path like old，in same dir, but tag ++; auto check exists
 
-    :param new_suffix: new type, new suffix
+def gen_brother_path(old_path: str, new_type: str = None) -> str:
     """
-    old_filepath_word_list = old_filepath.rsplit(".", 1)
+    new file path like old，in same dir, but tag ++; auto check exists and continue
+
+    :param new_type: new type, new suffix
+    """
+    old_filepath_word_list = old_path.rsplit(".", 1)
     join_index_format = ".{:0>2}."
 
     # give suffix, `.` must in output
-    if new_suffix:
-        new_suffix = f"{new_suffix.lstrip('.')}"
-        old_filepath_word_list = old_filepath_word_list[:1] + [new_suffix]
+    if new_type:
+        new_type = f"{new_type.lstrip('.')}"
+        old_filepath_word_list = old_filepath_word_list[:1] + [new_type]
     # no `.` before, no `.` in output
     elif len(old_filepath_word_list) == 1:
         old_filepath_word_list.append("")

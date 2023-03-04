@@ -25,7 +25,7 @@ import warnings
 
 import pandas as pd
 
-from common.filepath import check_excel_filepath_valid, gen_brother_filepath
+from common.filepath import check_excel_path_valid, gen_brother_path
 
 __all__ = ["split_excel_column"]
 
@@ -64,8 +64,8 @@ def split_excel_column_(
             new_df.loc[new_row_i] = new_row
             new_row_i += 1
 
-    new_path = gen_brother_filepath(excel_path)
-    new_df.to_excel(new_path.path, index=False)
+    new_path = gen_brother_path(excel_path)
+    new_df.to_excel(new_path, index=False)
     print(f"拆分完成，新文件路径：{new_path}")
 
 
@@ -78,7 +78,7 @@ def split_excel_column(*args, **kwargs):
 if __name__ == "__main__":
     while 1:
         excel_path = input("Excel 文件绝对路径（可直接拖动文件过来）：").strip(" '")
-        if not check_excel_filepath_valid(excel_path):
+        if not check_excel_path_valid(excel_path):
             print("不是 Excel 文件")
         elif not os.path.exists(excel_path):
             print("文件不存在")
