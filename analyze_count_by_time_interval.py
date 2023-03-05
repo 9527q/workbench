@@ -26,6 +26,7 @@ def analyze_count_by_time_interval(
 ):
     # 读取 Excel 文件
     df = pd.read_csv(csv_path, on_bad_lines='skip')
+    print(f"total sql count: {len(df)}")
 
     # 转换 TS 列为时间戳格式
     df[timestamp_column_name] = pd.to_datetime(df[timestamp_column_name])
